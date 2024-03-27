@@ -1,3 +1,5 @@
 *.o
 tapes
 .vscode
+data.txt
+sorted.txt
