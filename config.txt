@@ -1,0 +1,5 @@
+config params for TapeInterface:
+write_delay = 1000 ms
+read_delay  = 20 ms
+move_delay  = 100 ms
+swap_delay  = 350 ms

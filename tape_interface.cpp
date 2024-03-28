@@ -3,6 +3,14 @@
 #include <iostream>
 #include <string>
 
+#include <chrono>
+#include <thread>
+
+void delay(int milliseconds) 
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
+
 int binaryToDecimal(const std::string& binary_str) 
 {
     int decimal = 0;
@@ -39,6 +47,8 @@ std::string intToBinaryString(int number)
 
 int32_t TapeInterface::read() 
 {
+    delay(read_delay);
+    
     cur_tape.seekg(1, std::ios_base::cur);
 
     std::string binary_number;
@@ -57,6 +67,8 @@ int32_t TapeInterface::read()
 
 void TapeInterface::write(int32_t number)
 {
+    delay(write_delay);
+
     std::string binary_number = intToBinaryString(number);
 
     cur_tape.seekp(1, std::ios_base::cur);
@@ -68,6 +80,8 @@ void TapeInterface::write(int32_t number)
 
 void TapeInterface::move_next_right()
 {
+    delay(move_delay);
+
     cur_tape.seekg(33, std::ios_base::cur);
 
     char symbol;
@@ -88,6 +102,8 @@ void TapeInterface::move_right(size_t cells_to_move)
 
 void TapeInterface::move_next_left()
 {
+    delay(move_delay);
+
     char symbol;
     cur_tape.get(symbol);
     cur_tape.seekg(-1, std::ios_base::cur);
@@ -108,6 +124,8 @@ void TapeInterface::move_left(size_t cells_to_move)
 
 void TapeInterface::swap_tape(std::string new_tape_name)
 {
+    delay(swap_delay);
+
     if(cur_tape.is_open())
     {
         cur_tape.close();
@@ -121,7 +139,7 @@ void TapeInterface::swap_tape(std::string new_tape_name)
         std::cout << "File" << new_tape_name << "didn`t open" << std::endl;
     }
 
-    std::cout << "File " << new_tape_name << " opened" << std::endl;
+    // std::cout << "File " << new_tape_name << " opened" << std::endl;
 
     currsor_pos = 0;
 }

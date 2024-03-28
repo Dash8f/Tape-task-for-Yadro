@@ -38,5 +38,3 @@ public:
 
     void swap_tape(std::string new_tape);
 };
-
-//std::ios::in | std::ios::out | std::ios::app - для чтения и записи
