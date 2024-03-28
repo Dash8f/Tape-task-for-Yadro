@@ -28,9 +28,15 @@ public:
 
     int32_t read();
     void write(int32_t number);
-    void move_forward();
-    void move_back();
-    void swap_tape(std::fstream new_tape);
+
+    void move_next_right();
+    void move_right(size_t cells_to_move);
+
+    void move_next_left();
+    void move_left(size_t cells_to_move);
+
+
+    void swap_tape(std::string new_tape);
 };
 
 //std::ios::in | std::ios::out | std::ios::app - для чтения и записи
