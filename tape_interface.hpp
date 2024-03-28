@@ -12,18 +12,8 @@ private:
     size_t swap_delay;
 private:
     std::fstream cur_tape;
-    size_t currsor_pos = 0;
-
 public:
-    TapeInterface( size_t write_delay_, 
-                   size_t read_delay_, 
-                   size_t move_delay_,
-                   size_t swap_delay_) : 
-                   write_delay(write_delay_),
-                   read_delay(read_delay_),
-                   move_delay(move_delay_),
-                   swap_delay(swap_delay_) {};
-
+    TapeInterface(std::string config_file_name);
     ~TapeInterface() = default;
 
     int32_t read();
@@ -36,5 +26,5 @@ public:
     void move_left(size_t cells_to_move);
 
 
-    void swap_tape(std::string new_tape);
+    void swap_tape(std::string new_tape_name);
 };
