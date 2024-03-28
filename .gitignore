@@ -3,3 +3,5 @@ tapes
 .vscode
 data.txt
 sorted.txt
+data_generator.cpp
+data_generator

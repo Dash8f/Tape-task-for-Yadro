@@ -1,6 +1,7 @@
 #include "tape_interface.hpp"
 
 #include <iostream>
+#include <fstream>
 #include <string>
 
 #include <chrono>

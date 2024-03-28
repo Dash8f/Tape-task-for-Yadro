@@ -12,7 +12,7 @@ int main()
     {
         std::cout << "Config file is openen. Config settings:" << std::endl;
 
-        config_file.seekg(47, std::ios_base::cur);
+        config_file.seekg(14, std::ios_base::cur);
         config_file >> write_delay;
         std::cout << "Write delay is " << write_delay << " ms" << std::endl;
 
@@ -29,21 +29,12 @@ int main()
         std::cout << "Swap delay is " << swap_delay << " ms" <<std::endl;
     }
 
-    TapeInterface tape_interface{write_delay,read_delay,move_delay,swap_delay};
+    TapeInterface tape_interface{write_delay,
+                                 read_delay,
+                                 move_delay,
+                                 swap_delay};
 
     tape_interface.swap_tape("data.txt");
-
-    std::cout << tape_interface.read() << std::endl;
-
-    tape_interface.move_next_right();
-
-    tape_interface.write(99999);
-
-    std::cout << tape_interface.read() << std::endl;
-
-    tape_interface.move_next_left();
-
-    std::cout << tape_interface.read() << std::endl;
 
     return 0;
 }
