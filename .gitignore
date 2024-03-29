@@ -1,7 +1,6 @@
 *.o
 tapes
 .vscode
-data.txt
-sorted.txt
+*.txt
 data_generator.cpp
 data_generator
