@@ -3,13 +3,16 @@
 #include <iostream>
 #include <fstream>
 
-struct Tape
+class Tape
 {
-    std::string tape_name = "";
-    size_t tape_size = 0;
-    std::fstream tape_file;
+public:
+    std::string tape_name;
+    size_t tape_size;
+    std::fstream* tape_file;
+public:
+    Tape(std::string tape_name_, size_t tape_size_);
+    ~Tape() = default;
 };
-
 
 class TapeInterface
 {
@@ -19,10 +22,11 @@ private:
     size_t move_delay;
     size_t swap_delay;
 private:
-    Tape* cur_tape;
+    //Tape* cur_tape;
+    Tape& tape;
     size_t curros_pos = 0;
 public:
-    TapeInterface(std::string config_file_name);
+    TapeInterface(std::string config_file_name, Tape& first_tape) ;
     ~TapeInterface() = default;
 
     int32_t read();
@@ -37,6 +41,5 @@ public:
     void move_next_left();
     void move_left(size_t cells_to_move);
 
-    void swap_tape(std::string new_tape_name);
-    void swap_tape(Tape* new_tape);
+    void swap_tape(Tape& new_tape);
 };

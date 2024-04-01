@@ -1,4 +1,4 @@
-CXX_FLAGS = -std=c++17
+CXX_FLAGS = -std=c++17 -fsanitize=address -g -ggdb3
 
 TRGT = tapes
 

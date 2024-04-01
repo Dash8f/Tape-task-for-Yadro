@@ -9,15 +9,16 @@
 
 #define size_of_number 32
 
+#define BIN_ZERO "00000000000000000000000000000000"
+
 #define symbol_of_start   '<'
 #define symbol_of_end     '>'
+#define split_symbol ' '
 
 #define read_delay_indentation   14
 #define write_delay_indentation  18
 #define move_delay_indentation   18
 #define swap_delay_indentation   18
-
-
 
 void delay(int milliseconds) 
 {
@@ -88,7 +89,41 @@ std::string decimal_to_binary_string(int num)
     return binary_str;
 }
 
-TapeInterface::TapeInterface(std::string config_file_name)
+Tape::Tape(std::string tape_name_, size_t tape_size_)
+{
+    tape_size = tape_size_;
+    tape_name = tape_name_;
+
+    tape_file = new std::fstream;
+
+    tape_file->open(tape_name_);
+
+    if (!tape_file->is_open()) 
+    {
+        std::fstream tmp(tape_name_);
+
+        tmp.open(tape_name_, std::ios::out);
+
+        tmp << symbol_of_start;
+        for(int i = 0; i < tape_size_;  ++i)
+        {
+            tmp <<  BIN_ZERO << split_symbol;
+        }
+
+        tmp.seekp(-1, std::ios_base::cur);
+        tmp << symbol_of_end;
+
+        tmp.close();
+    }
+    else
+    {
+        tape_file->seekp(0, std::ios_base::beg);
+        tape_file->seekg(0, std::ios_base::beg);
+        tape_file->close();
+    }
+}
+
+TapeInterface::TapeInterface(std::string config_file_name, Tape& first_tape) : tape(first_tape)
 {
     std::fstream config_file;
 
@@ -124,20 +159,21 @@ TapeInterface::TapeInterface(std::string config_file_name)
 int32_t TapeInterface::read() 
 {
     delay(read_delay);
+
+    tape.tape_file->open(tape.tape_name, std::ios::in);
     
-    cur_tape->tape_file.seekg(1, std::ios_base::cur);
+    tape.tape_file->seekg(1 + curros_pos * (size_of_number + 1));
 
-    std::string binary_number;
+    std::string binary_number = "";
 
-    char symbol;
+    char symbol = ' ';
     for(int cnt = 0; cnt < size_of_number; ++cnt)
     {
-        cur_tape->tape_file.get(symbol);
+        tape.tape_file->get(symbol);
         binary_number += symbol;
     }
 
-    cur_tape->tape_file.seekg(-(size_of_number + 1), std::ios_base::cur);
-
+    tape.tape_file->close();
     return binary_string_to_decimal(binary_number);
 }
 
@@ -158,13 +194,15 @@ void TapeInterface::write(int32_t number)
 {
     delay(write_delay);
 
+    tape.tape_file->open(tape.tape_name, std::ios::in | std::ios::out | std::ios::ate);
+
     std::string binary_number = decimal_to_binary_string(number);
 
-    cur_tape->tape_file.seekp(1, std::ios_base::cur);
+    tape.tape_file->seekp(1 + curros_pos * (size_of_number + 1));
 
-    cur_tape->tape_file << binary_number;
+    *tape.tape_file << binary_number;
 
-    cur_tape->tape_file.seekp(-(size_of_number + 1), std::ios_base::cur);
+    tape.tape_file->close();
 }
 
 void TapeInterface::write_vector(std::vector<int32_t> numbers)
@@ -180,16 +218,8 @@ void TapeInterface::move_next_right()
 {
     delay(move_delay);
 
-    cur_tape->tape_file.seekg((size_of_number + 1), std::ios_base::cur);
-
-    char symbol;
-    cur_tape->tape_file.get(symbol);
-    cur_tape->tape_file.seekg(-1, std::ios_base::cur);
-
-    if(symbol == symbol_of_end)
-    {
-        cur_tape->tape_file.seekg(-(size_of_number + 1), std::ios_base::cur);
-    }
+    if(curros_pos + 1 < tape.tape_size)
+        ++curros_pos;
 }
 
 void TapeInterface::move_right(size_t cells_to_move)
@@ -201,17 +231,8 @@ void TapeInterface::move_right(size_t cells_to_move)
 void TapeInterface::move_next_left()
 {
     delay(move_delay);
-
-    char symbol;
-    cur_tape->tape_file.get(symbol);
-    cur_tape->tape_file.seekg(-1, std::ios_base::cur);
-
-    if(symbol == symbol_of_start)
-    {
-        return;
-    }
-
-    cur_tape->tape_file.seekg(-(size_of_number + 1), std::ios_base::cur);
+    if(curros_pos > 0)
+        --curros_pos;
 }
 
 void TapeInterface::move_left(size_t cells_to_move)
@@ -220,34 +241,10 @@ void TapeInterface::move_left(size_t cells_to_move)
         move_next_left();
 }
 
-void TapeInterface::swap_tape(std::string new_tape_name)
+void TapeInterface::swap_tape(Tape& new_tape)
 {
     delay(swap_delay);
-
-    if(cur_tape->tape_file.is_open())
-    {
-        cur_tape->tape_file.close();
-        std::cout << "old file was closed" << std::endl;
-    }
-
-    cur_tape->tape_file.open(new_tape_name, std::ios::in | std::ios::out);
-
-    if(!cur_tape->tape_file.is_open())
-    {
-        //std::cout << "File " << new_tape_name << " didn't open" << std::endl;
-    }
-}
-
-void TapeInterface::swap_tape(Tape* new_tape)
-{
-    cur_tape = new_tape;
-
-    if(!cur_tape->tape_file.is_open())
-        cur_tape->tape_file.open(cur_tape->tape_name, std::ios::in | std::ios::out);
-
-    cur_tape->tape_file.seekp(0, std::ios_base::beg);
-    cur_tape->tape_file.seekg(0, std::ios_base::beg);
-
-    //std::cout << cur_tape->tape_name << std::endl;
+    tape = new_tape;
+    curros_pos = 0;
 }
 
