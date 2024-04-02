@@ -3,6 +3,7 @@
 #include "tape_interface.hpp"
 
 #include <iostream>
+#include <vector>
 #include <fstream>
 
 class TapesManager

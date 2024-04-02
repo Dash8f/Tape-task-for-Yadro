@@ -1,23 +1,27 @@
 CXX_FLAGS = -std=c++17 -fsanitize=address -g -ggdb3
 
+OBJECTS = obj/tape_interface.o obj/tapes_manager.o obj/main.o
+
 TRGT = tapes
 
-all: tape_interface.o tapes_manager.o main.o
-	@g++ tape_interface.o tapes_manager.o main.o -o $(TRGT) $(CXX_FLAGS)
-	@echo '$(TRGT) has been done'
+all: $(TRGT)
 
-tape_interface.o: tape_interface.cpp
-	@g++ -c -o tape_interface.o tape_interface.cpp $(CXX_FLAGS)
+obj/%.o: src/%.cpp
+	mkdir -p $(@D)
+	g++ $(CXX_FLAGS) -c -o $@ $<
 
-tapes_manager.o: tapes_manager.cpp
-	@g++ -c -o tapes_manager.o tapes_manager.cpp $(CXX_FLAGS)
-
-main.o: main.cpp
-	@g++ -c -o main.o main.cpp $(CXX_FLAGS)
+$(TRGT): $(OBJECTS)
+	g++ $(OBJECTS) -o $(TRGT) $(CXX_FLAGS)
 
 run: $(TRGT)
 	@./$(TRGT)
 
 clean:
-	@rm -f *.o
+	rm -rf obj
 	@echo '.o files are cleaned'
+
+create_data:
+	@./data_generator
+
+data_generator: data/data_generator.cpp
+	g++ data/data_generator.cpp -w -o data_generator

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <vector>
 #include <fstream>
 
 class Tape
@@ -16,15 +17,16 @@ public:
 
 class TapeInterface
 {
-private:
+public:
+//private:
     size_t write_delay;
     size_t read_delay;
     size_t move_delay;
     size_t swap_delay;
-private:
+//private:
     //Tape* cur_tape;
     Tape& tape;
-    size_t curros_pos = 0;
+    size_t cursor_pos = 0;
 public:
     TapeInterface(std::string config_file_name, Tape& first_tape) ;
     ~TapeInterface() = default;

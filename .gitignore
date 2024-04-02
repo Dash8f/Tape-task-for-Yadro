@@ -1,6 +1,5 @@
-*.o
-tapes
 .vscode
-*.txt
-data_generator.cpp
+obj
+
+tapes
 data_generator

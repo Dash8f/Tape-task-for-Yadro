@@ -1,20 +1,23 @@
-#include "tape_interface.hpp"
-#include "tapes_manager.hpp"
+#include "../include/tape_interface.hpp"
+#include "../include/tapes_manager.hpp"
+
+#include <iostream>
+#include <vector>
 
 #define N 10
 
 int main()
 {
-    Tape first_tape{"data.txt", N};
-    Tape tape_1{"data1.txt", 10};
-    Tape tape_2{"data2.txt", 10};
+    Tape first_tape{"data/data.txt", N};
+    Tape tape_1{"data/data1.txt", 10};
+    Tape tape_2{"data/data2.txt", 10};
 
     TapeInterface tape_interface("config.txt", first_tape);
 
     TapesManager tapes_manager{tape_interface};
 
     tape_interface.swap_tape(tape_1);
-    std::vector<int> nums1 = tape_interface.read_to_vector(10);
+    std::vector<int32_t> nums1 = tape_interface.read_to_vector(10);
 
     std::cout << "first tape: ";
     for(int i = 0; i < tape_1.tape_size; ++i)
@@ -60,7 +63,7 @@ int main()
     std::cout << std::endl;
 
 
-    Tape tape_3 = tapes_manager.merge_sorted_tapes("sorted.txt", tape_1, tape_2);
+    Tape tape_3 = tapes_manager.merge_sorted_tapes("data/merged.txt", tape_1, tape_2);
 
     tape_interface.swap_tape(tape_3);
     nums1 = tape_interface.read_to_vector(tape_3.tape_size);

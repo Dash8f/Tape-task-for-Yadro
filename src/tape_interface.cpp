@@ -1,6 +1,7 @@
-#include "tape_interface.hpp"
+#include "../include/tape_interface.hpp"
 
 #include <iostream>
+#include <vector>
 #include <fstream>
 #include <string>
 
@@ -162,7 +163,7 @@ int32_t TapeInterface::read()
 
     tape.tape_file->open(tape.tape_name, std::ios::in);
     
-    tape.tape_file->seekg(1 + curros_pos * (size_of_number + 1));
+    tape.tape_file->seekg(1 + cursor_pos * (size_of_number + 1));
 
     std::string binary_number = "";
 
@@ -179,13 +180,36 @@ int32_t TapeInterface::read()
 
 std::vector<int32_t> TapeInterface::read_to_vector(size_t vector_size)
 {
+    size_t prev_currsor_pos = cursor_pos;
+
     std::vector<int32_t> numbers;
+
+    #ifdef DEBUG 
+    std::cout << "vector size is " << vector_size << ' ';
+    #endif
+
+    if(vector_size > (tape.tape_size - cursor_pos))
+        vector_size = tape.tape_size - cursor_pos;
+
+    #ifdef DEBUG
+    std::cout << "vector size is " << vector_size << ' ';
+    #endif
 
     for(size_t cnt = 0; cnt < vector_size; ++cnt)
     {   
+        #ifdef DEBUG
+        std::cout << "cursor_pos in read = " << cursor_pos << ' ';
+        #endif
+
         numbers.push_back(read());
         move_next_right();
     }
+
+    #ifdef DEBUG
+    std::cout << std::endl;
+    #endif
+
+    cursor_pos = prev_currsor_pos;
 
     return numbers;
 }
@@ -198,7 +222,7 @@ void TapeInterface::write(int32_t number)
 
     std::string binary_number = decimal_to_binary_string(number);
 
-    tape.tape_file->seekp(1 + curros_pos * (size_of_number + 1));
+    tape.tape_file->seekp(1 + cursor_pos * (size_of_number + 1));
 
     *tape.tape_file << binary_number;
 
@@ -218,8 +242,8 @@ void TapeInterface::move_next_right()
 {
     delay(move_delay);
 
-    if(curros_pos + 1 < tape.tape_size)
-        ++curros_pos;
+    if(cursor_pos + 1 < tape.tape_size)
+        ++cursor_pos;
 }
 
 void TapeInterface::move_right(size_t cells_to_move)
@@ -231,8 +255,8 @@ void TapeInterface::move_right(size_t cells_to_move)
 void TapeInterface::move_next_left()
 {
     delay(move_delay);
-    if(curros_pos > 0)
-        --curros_pos;
+    if(cursor_pos > 0)
+        --cursor_pos;
 }
 
 void TapeInterface::move_left(size_t cells_to_move)
@@ -245,6 +269,6 @@ void TapeInterface::swap_tape(Tape& new_tape)
 {
     delay(swap_delay);
     tape = new_tape;
-    curros_pos = 0;
+    cursor_pos = 0;
 }
 
