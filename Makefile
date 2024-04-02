@@ -20,8 +20,8 @@ clean:
 	rm -rf obj
 	@echo '.o files are cleaned'
 
-create_data:
+new_data:
 	@./data_generator
 
 data_generator: data/data_generator.cpp
-	g++ data/data_generator.cpp -w -o data_generator
+	g++ -w -o $@ $<
