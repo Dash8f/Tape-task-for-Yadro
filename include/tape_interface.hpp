@@ -18,17 +18,16 @@ public:
 class TapeInterface
 {
 public:
-//private:
+private:
     size_t write_delay;
     size_t read_delay;
     size_t move_delay;
     size_t swap_delay;
-//private:
-    //Tape* cur_tape;
-    Tape& tape;
+private:
+    Tape* tape;
     size_t cursor_pos = 0;
 public:
-    TapeInterface(std::string config_file_name, Tape& first_tape) ;
+    TapeInterface(std::string config_file_name) ;
     ~TapeInterface() = default;
 
     int32_t read();

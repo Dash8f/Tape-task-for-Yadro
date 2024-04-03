@@ -9,15 +9,17 @@
 class TapesManager
 {
 private:
+    size_t memory_capacity;
     TapeInterface& tape_interface;
 public:
-    TapesManager(TapeInterface& tape_interface_) : tape_interface(tape_interface_) {};
+    TapesManager(TapeInterface& tape_interface_, size_t memory_capacity_) : 
+                                tape_interface(tape_interface_), memory_capacity(memory_capacity_) {};
     ~TapesManager() = default;
 
-    Tape merge_sort_tape(Tape& tape_to_sort);
-// private:
-    void delete_tape(Tape tape);
-
-    void sort_short_tape(Tape& tape);
+    Tape sort_tape(std::string sorted_file_name, Tape tape_to_sort);
+private:
     Tape merge_sorted_tapes(std::string new_tape_name, Tape& tape_1, Tape& tape_2);
+    std::vector<Tape> split_tape(Tape& tape_to_sort);
+    Tape sort_tape_(std::string sorted_file_name, std::vector<Tape> vector_of_tapes);
+
 };

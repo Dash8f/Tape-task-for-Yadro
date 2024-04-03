@@ -1,4 +1,4 @@
-CXX_FLAGS = -std=c++17 -fsanitize=address -g -ggdb3
+CXX_FLAGS = -std=c++17 -fsanitize=address -g -ggdb3 -W
 
 OBJECTS = obj/tape_interface.o obj/tapes_manager.o obj/main.o
 

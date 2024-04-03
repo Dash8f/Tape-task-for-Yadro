@@ -2,77 +2,37 @@
 #include "../include/tapes_manager.hpp"
 
 #include <iostream>
-#include <vector>
+#include <string>
 
-#define N 10
+size_t get_token_value_from_config(std::string config, std::string token_name);
 
-int main()
+int main(int argc, char** argv)
 {
-    Tape first_tape{"data/data.txt", N};
-    Tape tape_1{"data/data1.txt", 10};
-    Tape tape_2{"data/data2.txt", 10};
-
-    TapeInterface tape_interface("config.txt", first_tape);
-
-    TapesManager tapes_manager{tape_interface};
-
-    tape_interface.swap_tape(tape_1);
-    std::vector<int32_t> nums1 = tape_interface.read_to_vector(10);
-
-    std::cout << "first tape: ";
-    for(int i = 0; i < tape_1.tape_size; ++i)
+    if(argc != 3)
     {
-        std::cout << nums1[i] << ' ';
+        std::cout << "not enough arguments" << std::endl;
+        return 0;
     }
-    std::cout << std::endl;
 
-    tapes_manager.sort_short_tape(tape_1);
-    tape_interface.swap_tape(tape_1);
-    nums1 = tape_interface.read_to_vector(10);
+    std::string data_file_name = argv[1];
+    std::string sorted_file_name = argv[2];
 
-    std::cout << "Sorted first tape: ";
-    for(int i = 0; i < tape_1.tape_size; ++i)
-    {
-        std::cout << nums1[i] << ' ';
-    }
-    std::cout << std::endl;
+    size_t size_of_data_tape = get_token_value_from_config("config.txt", "size_of_data_tape");
+    size_t memory_capacity = get_token_value_from_config("config.txt", "memory_capacity");
 
+    Tape data_tape{data_file_name, size_of_data_tape};
 
+    std::cout << "Data file path: " <<  data_file_name << std::endl;
+    std::cout << "Sorted file path: " <<  sorted_file_name << std::endl;
+    TapeInterface tape_interface("config.txt");
+    std::cout << "Size of data_file = " << size_of_data_tape << std::endl;
+    std::cout << "Memory capacity = " << memory_capacity << std::endl;
 
+    TapesManager tapes_manager{tape_interface, memory_capacity};
 
+    Tape sorted_tape = tapes_manager.sort_tape(sorted_file_name, data_tape);
 
-    tape_interface.swap_tape(tape_2);
-    nums1 = tape_interface.read_to_vector(10);
-
-    std::cout << "second tape: ";
-    for(int i = 0; i < tape_1.tape_size; ++i)
-    {
-        std::cout << nums1[i] << ' ';
-    }
-    std::cout << std::endl;
-
-    tapes_manager.sort_short_tape(tape_2);
-    tape_interface.swap_tape(tape_2);
-    nums1 = tape_interface.read_to_vector(10);
-
-    std::cout << "Sorted second tape: ";
-    for(int i = 0; i < tape_2.tape_size; ++i)
-    {
-        std::cout << nums1[i] << ' ';
-    }
-    std::cout << std::endl;
-
-
-    Tape tape_3 = tapes_manager.merge_sorted_tapes("data/merged.txt", tape_1, tape_2);
-
-    tape_interface.swap_tape(tape_3);
-    nums1 = tape_interface.read_to_vector(tape_3.tape_size);
-    std::cout << "Merged tape: ";
-    for(int i = 0; i < tape_3.tape_size; ++i)
-    {
-        std::cout << nums1[i] << ' ';
-    }
-    std::cout << std::endl;
+    std::cout << "Result file path: " << sorted_tape.tape_name << std::endl;
 
     return 0;
 } 

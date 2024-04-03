@@ -44,35 +44,22 @@ int main()
     unsigned rand_value = 1;
     srand(rand_value);
 
-    std::fstream data1, data2;
+    std::fstream data1, data2, data;
 
-    data1.open("data/data1.txt", std::ios::out | std::ios_base::trunc);
-    data2.open("data/data2.txt", std::ios::out | std::ios_base::trunc);
+    data.open("data/data.txt", std::ios::out | std::ios_base::trunc);
 
-    data1 << '<';
-    data2 << '<';
+    data  << '<';
 
     int size_of_data_files = 0;
 
     std::cin >> size_of_data_files;
 
-    for(int i = 0; i < size_of_data_files;  ++i)
+    for(int i = 0; i < 100;  ++i)
     {
         std::string random_number = decimal_to_binary_string(rand() - (RAND_MAX / 2));
 
-        data1 << random_number << ' ';
+        data << random_number << ' ';
     }
-
-    for(int i = 0; i < size_of_data_files;  ++i)
-    {
-        std::string random_number = decimal_to_binary_string(rand() - (RAND_MAX / 2));
-
-        data2 << random_number << ' ';
-    }
-
-    data1.seekp(-1, std::ios_base::cur);
-    data2.seekp(-1, std::ios_base::cur);
-
-    data1 << '>';
-    data2 << '>';
+    data.seekp(-1, std::ios_base::cur);
+    data  << '>';
 }

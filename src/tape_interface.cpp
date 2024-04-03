@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <string>
+#include <sstream>
 
 #include <chrono>
 #include <thread>
@@ -16,14 +17,42 @@
 #define symbol_of_end     '>'
 #define split_symbol ' '
 
-#define read_delay_indentation   14
-#define write_delay_indentation  18
-#define move_delay_indentation   18
-#define swap_delay_indentation   18
-
 void delay(int milliseconds) 
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
+
+int string_to_int(std::string number_str) {
+    int number;
+    std::stringstream ss(number_str);
+
+    ss >> number;
+
+    return number;
+}
+
+
+size_t get_token_value_from_config(std::string config, std::string token_name)
+{
+    std::ifstream file(config);
+    std::string line;
+    std::string size_value;
+
+    while (std::getline(file, line)) 
+    {
+        size_t pos = line.find(token_name);
+        if (pos != std::string::npos) 
+        {
+            size_t equal_sign_pos = line.find("=", pos);
+            if (equal_sign_pos != std::string::npos) 
+            {
+                file.close();
+                return  string_to_int(line.substr(equal_sign_pos + 1));
+            }
+        }
+    }
+
+    return 0;
 }
 
 int binary_string_to_decimal(const std::string& binary_str) 
@@ -106,7 +135,7 @@ Tape::Tape(std::string tape_name_, size_t tape_size_)
         tmp.open(tape_name_, std::ios::out);
 
         tmp << symbol_of_start;
-        for(int i = 0; i < tape_size_;  ++i)
+        for(size_t i = 0; i < tape_size_;  ++i)
         {
             tmp <<  BIN_ZERO << split_symbol;
         }
@@ -124,57 +153,41 @@ Tape::Tape(std::string tape_name_, size_t tape_size_)
     }
 }
 
-TapeInterface::TapeInterface(std::string config_file_name, Tape& first_tape) : tape(first_tape)
+TapeInterface::TapeInterface(std::string config_file_name)
 {
-    std::fstream config_file;
-
-    config_file.open(config_file_name, std::ios::in);
-
-    if(!config_file.is_open())
-    {
-        std::cout << "Tape interface was not created" << std::endl;
-        return;
-    }
-
-    std::cout << "Config file was openen. Config settings:" << std::endl;
-
-    config_file.seekg(read_delay_indentation, std::ios_base::cur); //TODO -=-
-    config_file >> write_delay;
+    write_delay = get_token_value_from_config(config_file_name, "write_delay");
     std::cout << "Write delay is " << write_delay << " ms" << std::endl;
 
-    config_file.seekg(write_delay_indentation, std::ios_base::cur);
-    config_file >> read_delay;
+    read_delay = get_token_value_from_config(config_file_name, "read_delay");
     std::cout << "Read delay is " << read_delay << " ms" <<std::endl;
 
-    config_file.seekg(move_delay_indentation, std::ios_base::cur);
-    config_file >> move_delay;
+    move_delay = get_token_value_from_config(config_file_name, "move_delay");
     std::cout << "Move delay is " << move_delay << " ms" <<std::endl;
 
-    config_file.seekg(swap_delay_indentation, std::ios_base::cur);
-    config_file >> swap_delay;
+    swap_delay = get_token_value_from_config(config_file_name, "swap_delay");
     std::cout << "Swap delay is " << swap_delay << " ms" <<std::endl;
 
-    config_file.close();
+    tape = NULL;
 }
 
 int32_t TapeInterface::read() 
 {
     delay(read_delay);
 
-    tape.tape_file->open(tape.tape_name, std::ios::in);
+    tape->tape_file->open(tape->tape_name, std::ios::in);
     
-    tape.tape_file->seekg(1 + cursor_pos * (size_of_number + 1));
+    tape->tape_file->seekg(1 + cursor_pos * (size_of_number + 1));
 
     std::string binary_number = "";
 
     char symbol = ' ';
     for(int cnt = 0; cnt < size_of_number; ++cnt)
     {
-        tape.tape_file->get(symbol);
+        tape->tape_file->get(symbol);
         binary_number += symbol;
     }
 
-    tape.tape_file->close();
+    tape->tape_file->close();
     return binary_string_to_decimal(binary_number);
 }
 
@@ -184,30 +197,14 @@ std::vector<int32_t> TapeInterface::read_to_vector(size_t vector_size)
 
     std::vector<int32_t> numbers;
 
-    #ifdef DEBUG 
-    std::cout << "vector size is " << vector_size << ' ';
-    #endif
-
-    if(vector_size > (tape.tape_size - cursor_pos))
-        vector_size = tape.tape_size - cursor_pos;
-
-    #ifdef DEBUG
-    std::cout << "vector size is " << vector_size << ' ';
-    #endif
+    if(vector_size > (tape->tape_size - cursor_pos))
+        vector_size = tape->tape_size - cursor_pos;
 
     for(size_t cnt = 0; cnt < vector_size; ++cnt)
     {   
-        #ifdef DEBUG
-        std::cout << "cursor_pos in read = " << cursor_pos << ' ';
-        #endif
-
         numbers.push_back(read());
         move_next_right();
     }
-
-    #ifdef DEBUG
-    std::cout << std::endl;
-    #endif
 
     cursor_pos = prev_currsor_pos;
 
@@ -218,37 +215,41 @@ void TapeInterface::write(int32_t number)
 {
     delay(write_delay);
 
-    tape.tape_file->open(tape.tape_name, std::ios::in | std::ios::out | std::ios::ate);
+    tape->tape_file->open(tape->tape_name, std::ios::in | std::ios::out | std::ios::ate);
 
     std::string binary_number = decimal_to_binary_string(number);
 
-    tape.tape_file->seekp(1 + cursor_pos * (size_of_number + 1));
+    tape->tape_file->seekp(1 + cursor_pos * (size_of_number + 1));
 
-    *tape.tape_file << binary_number;
+    *tape->tape_file << binary_number;
 
-    tape.tape_file->close();
+    tape->tape_file->close();
 }
 
 void TapeInterface::write_vector(std::vector<int32_t> numbers)
 {
+    size_t prev_currsor_pos = cursor_pos;
+
     for(size_t cnt = 0; cnt < numbers.size(); ++cnt)
     {   
         write(numbers[cnt]);
         move_next_right();
     }
+
+    cursor_pos = prev_currsor_pos;
 }
 
 void TapeInterface::move_next_right()
 {
     delay(move_delay);
 
-    if(cursor_pos + 1 < tape.tape_size)
+    if(cursor_pos + 1 < tape->tape_size)
         ++cursor_pos;
 }
 
 void TapeInterface::move_right(size_t cells_to_move)
 {
-    for(int cnt = 0; cnt < cells_to_move; ++cnt)
+    for(size_t cnt = 0; cnt < cells_to_move; ++cnt)
         move_next_right();
 }
 
@@ -261,14 +262,16 @@ void TapeInterface::move_next_left()
 
 void TapeInterface::move_left(size_t cells_to_move)
 {
-    for(int cnt = 0; cnt < cells_to_move; ++cnt)
+    for(size_t cnt = 0; cnt < cells_to_move; ++cnt)
         move_next_left();
 }
 
 void TapeInterface::swap_tape(Tape& new_tape)
 {
     delay(swap_delay);
-    tape = new_tape;
+
+    tape = &new_tape;
+
     cursor_pos = 0;
 }
 
