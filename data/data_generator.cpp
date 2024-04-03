@@ -54,7 +54,7 @@ int main()
 
     std::cin >> size_of_data_files;
 
-    for(int i = 0; i < 100;  ++i)
+    for(int i = 0; i < size_of_data_files;  ++i)
     {
         std::string random_number = decimal_to_binary_string(rand() - (RAND_MAX / 2));
 

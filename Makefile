@@ -14,6 +14,7 @@ $(TRGT): $(OBJECTS)
 	g++ $(OBJECTS) -o $(TRGT) $(CXX_FLAGS)
 
 run: $(TRGT)
+	rm data/sorted.txt
 	@./$(TRGT)
 
 clean:
@@ -21,6 +22,7 @@ clean:
 	@echo '.o files are cleaned'
 
 new_data:
+	@rm data/data.txt
 	@./data_generator
 
 data_generator: data/data_generator.cpp

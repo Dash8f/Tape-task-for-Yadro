@@ -28,7 +28,7 @@ std::string make_merged_tape_name(Tape tape1, Tape tape2)
     std::string name1 = cut_tape_name(tape1.tape_name);
     std::string name2 = cut_tape_name(tape2.tape_name);
 
-    return name1 + name2 + ".txt"; 
+    return name1 + "_" + name2 + ".txt"; 
 }
 
 std::vector<int32_t> merge_vectors(std::vector<int32_t> vector1, std::vector<int32_t> vector2)
@@ -183,6 +183,14 @@ Tape TapesManager::sort_tape_(std::string sorted_file_name, std::vector<Tape> ve
         delete_file(vector_of_tapes[0].tape_name);
         delete_file(vector_of_tapes[1].tape_name);
 
+        return sorted_tape;
+    }
+    if(vector_of_tapes.size() == 1)
+    {
+        Tape sorted_tape{sorted_file_name, vector_of_tapes[0]};
+
+        delete_file(vector_of_tapes[0].tape_name);
+        
         return sorted_tape;
     }
     

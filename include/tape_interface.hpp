@@ -12,6 +12,7 @@ public:
     std::fstream* tape_file;
 public:
     Tape(std::string tape_name_, size_t tape_size_);
+    Tape(std::string tape_name_, Tape& tape_for_copying);
     ~Tape() = default;
 };
 
@@ -43,4 +44,6 @@ public:
     void move_left(size_t cells_to_move);
 
     void swap_tape(Tape& new_tape);
+
+    void print_interface_settings();
 };

@@ -1,5 +1,7 @@
 #include "../include/tape_interface.hpp"
 
+#include "../include/colors.hpp"
+
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -30,7 +32,6 @@ int string_to_int(std::string number_str) {
 
     return number;
 }
-
 
 size_t get_token_value_from_config(std::string config, std::string token_name)
 {
@@ -147,8 +148,6 @@ Tape::Tape(std::string tape_name_, size_t tape_size_)
     }
     else
     {
-        tape_file->seekp(0, std::ios_base::beg);
-        tape_file->seekg(0, std::ios_base::beg);
         tape_file->close();
     }
 }
@@ -156,16 +155,9 @@ Tape::Tape(std::string tape_name_, size_t tape_size_)
 TapeInterface::TapeInterface(std::string config_file_name)
 {
     write_delay = get_token_value_from_config(config_file_name, "write_delay");
-    std::cout << "Write delay is " << write_delay << " ms" << std::endl;
-
     read_delay = get_token_value_from_config(config_file_name, "read_delay");
-    std::cout << "Read delay is " << read_delay << " ms" <<std::endl;
-
     move_delay = get_token_value_from_config(config_file_name, "move_delay");
-    std::cout << "Move delay is " << move_delay << " ms" <<std::endl;
-
     swap_delay = get_token_value_from_config(config_file_name, "swap_delay");
-    std::cout << "Swap delay is " << swap_delay << " ms" <<std::endl;
 
     tape = NULL;
 }
@@ -275,3 +267,30 @@ void TapeInterface::swap_tape(Tape& new_tape)
     cursor_pos = 0;
 }
 
+void TapeInterface::print_interface_settings()
+{
+    std::cout << "TapeInterface settings:" << std::endl;
+
+    std::cout << "Write delay is " << MAGENTA << write_delay << " ms" << RESET << std::endl;
+    std::cout << "Read delay is "  << MAGENTA << read_delay  << " ms" << RESET <<std::endl;
+    std::cout << "Move delay is "  << MAGENTA << move_delay  << " ms" << RESET <<std::endl;
+    std::cout << "Swap delay is "  << MAGENTA << swap_delay  << " ms" << RESET <<std::endl;
+}
+
+Tape::Tape(std::string tape_name_, Tape& tape_for_copying)
+{
+    tape_size = tape_for_copying.tape_size;
+    tape_name = tape_name_;
+
+    tape_file = new std::fstream;
+    tape_file->open(tape_name_, std::ios::out | std::ios::trunc);
+
+    tape_for_copying.tape_file->open(tape_for_copying.tape_name, std::ios::in);
+
+    std::string text_from_tape;
+    std::getline(*tape_for_copying.tape_file, text_from_tape);
+
+    *tape_file >>  text_from_tape;
+
+    tape_file->close();
+}
