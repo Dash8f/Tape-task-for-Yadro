@@ -179,14 +179,12 @@ std::vector<Tape> TapesManager::split_tape(Tape& data_tape)
 
         vector_of_tapes.push_back(tmp_tape);
     }
-    std::cout << vector_of_tapes[0].tape_name << std::endl;
 
     return vector_of_tapes;
 }
 
 Tape TapesManager::sort_tape_(std::string sorted_file_name, std::vector<Tape> vector_of_tapes)
 {
-    std::cout << "SIZE is " << vector_of_tapes.size() << std::endl;
     if(vector_of_tapes.size() == 2)
     {
         delete_file(sorted_file_name);
