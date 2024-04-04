@@ -21,8 +21,7 @@ clean:
 	@echo '.o files are cleaned'
 
 new_data:
-	@rm data/data.txt
 	@./data_generator
 
 data_generator: data/data_generator.cpp
-	g++  $(CXX_FLAGS) -o $@ $<
+	g++  -std=c++17 -W -Iinclude -o $@ $<
