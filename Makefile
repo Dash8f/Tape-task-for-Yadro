@@ -1,10 +1,10 @@
-CXX_FLAGS = -std=c++17 -fsanitize=address -g -ggdb3 -W
+CXX_FLAGS = -std=c++17 -fsanitize=address -g -ggdb3 -W -Iinclude
 
 OBJECTS = obj/tape_interface.o obj/tapes_manager.o obj/main.o
 
 TRGT = tapes
 
-all: $(TRGT)
+all: $(TRGT) data_generator
 
 obj/%.o: src/%.cpp
 	mkdir -p $(@D)
@@ -14,7 +14,6 @@ $(TRGT): $(OBJECTS)
 	g++ $(OBJECTS) -o $(TRGT) $(CXX_FLAGS)
 
 run: $(TRGT)
-	rm data/sorted.txt
 	@./$(TRGT)
 
 clean:
@@ -26,4 +25,4 @@ new_data:
 	@./data_generator
 
 data_generator: data/data_generator.cpp
-	g++ -w -o $@ $<
+	g++  $(CXX_FLAGS) -o $@ $<

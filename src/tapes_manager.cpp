@@ -1,5 +1,5 @@
-#include "../include/tapes_manager.hpp"
-#include "../include/tape_interface.hpp"
+#include "tapes_manager.hpp"
+#include "tape_interface.hpp"
 
 #include <iostream>
 #include <vector>
@@ -8,8 +8,14 @@
 
 void delete_file(std::string file_name)
 {
-    std::filesystem::permissions(file_name, std::filesystem::perms::all);
-    std::filesystem::remove(file_name);
+    std::fstream file;
+    file.open(file_name);
+    if(file.is_open())
+    {
+        file.close();
+        std::filesystem::permissions(file_name, std::filesystem::perms::all);
+        std::filesystem::remove(file_name);
+    }
 }
 
 std::string cut_tape_name(std::string tape_name)
@@ -134,6 +140,8 @@ std::vector<Tape> TapesManager::split_tape(Tape& data_tape)
     size_t amount_of_files = data_tape.tape_size / memory_capacity;
     size_t rest = data_tape.tape_size % memory_capacity;
 
+    size_t size_of_tmp_files = memory_capacity;
+
     std::vector<Tape> vector_of_tapes;
 
     size_t main_pointer = 0;
@@ -143,41 +151,45 @@ std::vector<Tape> TapesManager::split_tape(Tape& data_tape)
         tape_interface.swap_tape(data_tape);
         tape_interface.move_right(main_pointer);
 
-        std::vector<int32_t> numbers = tape_interface.read_to_vector(memory_capacity);
-        main_pointer += memory_capacity;
+        std::vector<int32_t> numbers = tape_interface.read_to_vector(size_of_tmp_files);
+        main_pointer += size_of_tmp_files;
         std::sort(numbers.begin(), numbers.end());
 
-        Tape tmp_tape{("/tmp/" + std::to_string(files_cnt) + ".txt"), memory_capacity};
+        Tape tmp_tape{("/tmp/" + std::to_string(files_cnt) + ".txt"), size_of_tmp_files};
         tape_interface.swap_tape(tmp_tape);
         tape_interface.write_vector(numbers);
 
         vector_of_tapes.push_back(tmp_tape);
     }
 
-    if(rest != 0)
+    if(rest > 0)
     {
+        size_of_tmp_files = rest;
         ++amount_of_files;
 
         tape_interface.swap_tape(data_tape);
         tape_interface.move_right(main_pointer);
-        std::vector<int32_t> numbers = tape_interface.read_to_vector(rest);
-        main_pointer += rest;
+        std::vector<int32_t> numbers = tape_interface.read_to_vector(size_of_tmp_files);
+        main_pointer += size_of_tmp_files;
         std::sort(numbers.begin(), numbers.end());
 
-        Tape tmp_tape{"/tmp/" + std::to_string(amount_of_files - 1) + ".txt", rest};
+        Tape tmp_tape{"/tmp/" + std::to_string(amount_of_files - 1) + ".txt", size_of_tmp_files};
         tape_interface.swap_tape(tmp_tape);
         tape_interface.write_vector(numbers);
 
         vector_of_tapes.push_back(tmp_tape);
     }
+    std::cout << vector_of_tapes[0].tape_name << std::endl;
 
     return vector_of_tapes;
 }
 
 Tape TapesManager::sort_tape_(std::string sorted_file_name, std::vector<Tape> vector_of_tapes)
 {
+    std::cout << "SIZE is " << vector_of_tapes.size() << std::endl;
     if(vector_of_tapes.size() == 2)
     {
+        delete_file(sorted_file_name);
         Tape sorted_tape = merge_sorted_tapes(sorted_file_name, vector_of_tapes[0], vector_of_tapes[1]);
 
         delete_file(vector_of_tapes[0].tape_name);
@@ -187,6 +199,7 @@ Tape TapesManager::sort_tape_(std::string sorted_file_name, std::vector<Tape> ve
     }
     if(vector_of_tapes.size() == 1)
     {
+        delete_file(sorted_file_name);
         Tape sorted_tape{sorted_file_name, vector_of_tapes[0]};
 
         delete_file(vector_of_tapes[0].tape_name);
@@ -219,6 +232,21 @@ Tape TapesManager::sort_tape_(std::string sorted_file_name, std::vector<Tape> ve
 
 Tape TapesManager::sort_tape(std::string sorted_file_name, Tape tape_to_sort)
 {
+    if(memory_capacity >= tape_to_sort.tape_size)
+    {
+
+        tape_interface.swap_tape(tape_to_sort);
+        std::vector<int32_t> numbers = tape_interface.read_to_vector(tape_to_sort.tape_size);
+        std::sort(numbers.begin(), numbers.end());
+
+        delete_file(sorted_file_name);
+        Tape sorted_tape{sorted_file_name, tape_to_sort.tape_size};
+        tape_interface.swap_tape(sorted_tape);
+        tape_interface.write_vector(numbers);
+        
+        return sorted_tape;
+    }
+
     std::vector<Tape> vector_of_tapes = split_tape(tape_to_sort);
 
     Tape sorted_tape = sort_tape_(sorted_file_name, vector_of_tapes);

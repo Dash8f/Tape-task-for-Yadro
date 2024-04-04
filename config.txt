@@ -2,5 +2,5 @@ write_delay = 1 ms
 read_delay  = 1 ms
 move_delay  = 1 ms
 swap_delay  = 1 ms
-size_of_data_tape = 50
-memory_capacity = 50
+size_of_data_tape = 10
+memory_capacity = 10

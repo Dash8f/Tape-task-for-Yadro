@@ -1,6 +1,6 @@
-#include "../include/tape_interface.hpp"
+#include "tape_interface.hpp"
 
-#include "../include/colors.hpp"
+#include "colors.hpp"
 
 #include <iostream>
 #include <vector>

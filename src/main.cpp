@@ -1,7 +1,7 @@
-#include "../include/tape_interface.hpp"
-#include "../include/tapes_manager.hpp"
+#include "tape_interface.hpp"
+#include "tapes_manager.hpp"
 
-#include "../include/colors.hpp"
+#include "colors.hpp"
 
 #include <iostream>
 #include <string>
@@ -39,7 +39,7 @@ int main(int argc, char** argv)
         std::cout << RED <<"Not enough memory" << RESET << std::endl;
         return 0;
     }
-
+    
     print_info(data_file_name, sorted_file_name, size_of_data_tape, memory_capacity);
 
     Tape data_tape{data_file_name, size_of_data_tape};

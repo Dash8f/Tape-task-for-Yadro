@@ -1,11 +1,18 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <cstdlib>
 
-#include <iostream>
-#include <string>
-#include <bitset>
+void delete_file(std::string file_name)
+{
+    std::fstream file;
+    file.open(file_name);
+    if(file.is_open())
+    {
+        file.close();
+        std::filesystem::permissions(file_name, std::filesystem::perms::all);
+        std::filesystem::remove(file_name);
+    }
+}
 
 std::string decimal_to_binary_string(int num) 
 {
@@ -41,6 +48,8 @@ std::string decimal_to_binary_string(int num)
 
 int main()
 {
+    delete_file("data/data.txt");
+
     unsigned rand_value = 1;
     srand(rand_value);
 
@@ -52,6 +61,7 @@ int main()
 
     int size_of_data_files = 0;
 
+    std::cout << "Enter size of data file" << std::endl;
     std::cin >> size_of_data_files;
 
     for(int i = 0; i < size_of_data_files;  ++i)
