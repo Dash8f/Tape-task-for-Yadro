@@ -20,10 +20,10 @@ class TapeInterface
 {
 public:
 private:
-    size_t write_delay;
-    size_t read_delay;
-    size_t move_delay;
-    size_t swap_delay;
+    size_t write_delay = 0;
+    size_t read_delay = 0;
+    size_t move_delay = 0;
+    size_t swap_delay = 0;
 private:
     Tape* tape;
     size_t cursor_pos = 0;

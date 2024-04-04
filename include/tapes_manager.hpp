@@ -9,7 +9,7 @@
 class TapesManager
 {
 private:
-    size_t memory_capacity;
+    size_t memory_capacity = 2;
     TapeInterface& tape_interface;
 public:
     TapesManager(TapeInterface& tape_interface_, size_t memory_capacity_) : 
