@@ -14,7 +14,7 @@ $(TRGT): $(OBJECTS)
 	g++ $(OBJECTS) -o $(TRGT) $(CXX_FLAGS)
 
 run: $(TRGT)
-	@./$(TRGT)
+	@./$(TRGT) data/data.txt data/sorted.txt
 
 clean:
 	rm -rf obj
